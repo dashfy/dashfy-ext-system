@@ -186,8 +186,8 @@ describe('createSystemClient', () => {
   it('should throw when createPushInterval is not provided', () => {
     const register = createSystemClient({})
     expect(() => {
-      register({ logger: mockLogger as never, createPushInterval: undefined })
-    }).toThrow('@dashfy/ext-system requires push mode')
+      register({ logger: mockLogger, createPushInterval: undefined })
+    }).toThrow('@getdashfy/ext-system requires push mode')
   })
 
   it('should record push interval from config', async () => {
@@ -195,8 +195,8 @@ describe('createSystemClient', () => {
     const createPushInterval = createTestPushInterval(intervalUsed)
     const register = createSystemClient({ pushInterval: 5000 })
     const api = register({
-      logger: mockLogger as never,
-      createPushInterval: createPushInterval as never,
+      logger: mockLogger,
+      createPushInterval,
     })
 
     const callback = vi.fn()
@@ -211,8 +211,8 @@ describe('createSystemClient', () => {
       const createPushInterval = createTestPushInterval(intervalUsed)
       const register = createSystemClient({})
       const api = register({
-        logger: mockLogger as never,
-        createPushInterval: createPushInterval as never,
+        logger: mockLogger,
+        createPushInterval,
       })
 
       const callback = vi.fn()
@@ -256,8 +256,8 @@ describe('createSystemClient', () => {
       const intervalUsed = { current: 0 }
       const createPushInterval = createTestPushInterval(intervalUsed)
       const api = createSystemClient({})({
-        logger: mockLogger as never,
-        createPushInterval: createPushInterval as never,
+        logger: mockLogger,
+        createPushInterval,
       })
 
       const callback = vi.fn()
@@ -299,8 +299,8 @@ describe('createSystemClient', () => {
       const intervalUsed = { current: 0 }
       const createPushInterval = createTestPushInterval(intervalUsed)
       const api = createSystemClient({})({
-        logger: mockLogger as never,
-        createPushInterval: createPushInterval as never,
+        logger: mockLogger,
+        createPushInterval,
       })
 
       const callback = vi.fn()
@@ -324,8 +324,8 @@ describe('createSystemClient', () => {
       const intervalUsed = { current: 0 }
       const createPushInterval = createTestPushInterval(intervalUsed)
       const api = createSystemClient({})({
-        logger: mockLogger as never,
-        createPushInterval: createPushInterval as never,
+        logger: mockLogger,
+        createPushInterval,
       })
 
       const callback = vi.fn()
@@ -358,7 +358,7 @@ describe('createSystemClient', () => {
         speed: null,
         type: 'loopback',
         operstate: 'unknown',
-      } as never)
+      })
       si.networkStats.mockResolvedValue({
         iface: 'lo0',
         operstate: 'unknown',
@@ -366,13 +366,13 @@ describe('createSystemClient', () => {
         rx_sec: null,
         tx_bytes: 0,
         tx_sec: null,
-      } as never)
+      })
 
       const intervalUsed = { current: 0 }
       const createPushInterval = createTestPushInterval(intervalUsed)
       const api = createSystemClient({})({
-        logger: mockLogger as never,
-        createPushInterval: createPushInterval as never,
+        logger: mockLogger,
+        createPushInterval,
       })
 
       const callback = vi.fn()
@@ -411,8 +411,8 @@ describe('createSystemClient', () => {
       const intervalUsed = { current: 0 }
       const createPushInterval = createTestPushInterval(intervalUsed)
       const api = createSystemClient({ processLimit: 10 })({
-        logger: mockLogger as never,
-        createPushInterval: createPushInterval as never,
+        logger: mockLogger,
+        createPushInterval,
       })
 
       const callback = vi.fn()
@@ -434,8 +434,8 @@ describe('createSystemClient', () => {
       const intervalUsed = { current: 0 }
       const createPushInterval = createTestPushInterval(intervalUsed)
       const api = createSystemClient({ processLimit: 10 })({
-        logger: mockLogger as never,
-        createPushInterval: createPushInterval as never,
+        logger: mockLogger,
+        createPushInterval,
       })
 
       const callback = vi.fn()
@@ -459,8 +459,8 @@ describe('createSystemClient', () => {
       const intervalUsed = { current: 0 }
       const createPushInterval = createTestPushInterval(intervalUsed)
       const api = createSystemClient({})({
-        logger: mockLogger as never,
-        createPushInterval: createPushInterval as never,
+        logger: mockLogger,
+        createPushInterval,
       })
 
       const callback = vi.fn()

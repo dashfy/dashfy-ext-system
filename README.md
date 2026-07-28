@@ -1,11 +1,14 @@
-# Dashfy System Extension
+# `@getdashfy/ext-system`
 
-[![npm version](https://img.shields.io/npm/v/@dashfy/ext-system.svg?style=flat-square)](https://www.npmjs.com/package/@dashfy/ext-system)
-[![License](https://img.shields.io/github/license/dashfy/dashfy.svg?style=flat-square)](https://github.com/dashfy/dashfy/blob/main/LICENSE)
+![Full README Row](https://shieldcn.dev/group/npm/@getdashfy/ext-system+github/stars/dashfy/dashfy-ext-system+github/ci/dashfy/dashfy-ext-system+github/license/dashfy/dashfy-ext-system.svg?variant=branded&size=xs)
 
-> System monitoring extension for [Dashfy](https://github.com/dashfy/dashfy) - Monitor CPU, memory, disk, network, and processes.
+[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy/dashfy?referralCode=INMsTa&utm_medium=integration&utm_source=template&utm_campaign=generic)
 
-This extension provides widgets to display real-time system resource metrics from the machine running the Dashfy server using [systeminformation](https://github.com/sebhildebrandt/systeminformation).
+> System extension for [Dashfy](https://github.com/dashfy/dashfy) - Monitor CPU, memory, disk, network, and processes.
+
+This extension provides widgets to display real-time resource metrics from the machine running the Dashfy server, collected with [systeminformation](https://github.com/sebhildebrandt/systeminformation).
+
+![Dashfy dashboard with System extension widgets](https://raw.githubusercontent.com/dashfy/dashfy-ext-system/refs/heads/main/preview/dashfy-ext-system.png)
 
 ## Features
 
@@ -15,40 +18,55 @@ This extension provides widgets to display real-time system resource metrics fro
 - **🌐 Network stats**: Interface status, bytes transferred, and current speed
 - **📋 Process list**: Top processes sorted by CPU or memory usage
 - **🔧 System info**: Hostname, OS, CPU model, uptime, and hardware details
-- **🔋 Battery status**: Battery level, charging state, and time remaining
-- **⚡ Real-time updates**: Automatic data refresh via WebSocket subscriptions
+- **📈 Gauges & live charts**: Radial gauges and animated line charts for every metric
+- **⚡ Real-time updates**: Push-mode updates at a configurable interval
 - **🎨 Theme support**: Works with all Dashfy themes (light/dark mode)
 
 ## Installation
 
+Install with your favorite package manager:
+
+#### `npm`
+
 ```bash
-npm install @dashfy/ext-system
-# or
-pnpm add @dashfy/ext-system
-# or
-yarn add @dashfy/ext-system
+npm install @getdashfy/ext-system
 ```
 
-## Package Structure
+#### `pnpm`
 
-This extension has two entry points:
+```bash
+pnpm add @getdashfy/ext-system
+```
 
-- **`@dashfy/ext-system`** — Browser-safe React widgets (import in your React app)
-- **`@dashfy/ext-system/client`** — Server-only API client with `systeminformation` (import in your Dashfy server)
+#### `yarn`
 
-This separation ensures Node.js-only dependencies don't get bundled into your browser code.
+```bash
+yarn add @getdashfy/ext-system
+```
 
-## Quick Start
+#### `bun`
 
-### 1. Server Setup
+```bash
+bun add @getdashfy/ext-system
+```
 
-Register the System API client in your Dashfy server using **push mode**:
+## Quick start
+
+The package has two entry points. `@getdashfy/ext-system` holds the browser-safe React widgets, and `@getdashfy/ext-system/client` holds the server-only API client. Keeping them apart is what stops the Node-only `systeminformation` package from being bundled into your browser code, so always import the client from the `/client` subpath.
+
+### 1. Server setup
+
+Register the System API client in your Dashfy server (`dashfy.server.ts`) using **push mode**:
 
 ```ts
-import { Dashfy } from '@dashfy/server'
-import { createSystemClient } from '@dashfy/ext-system/client'
+import { Dashfy } from '@getdashfy/server'
+import { createSystemClient } from '@getdashfy/ext-system/client'
 
+// Create a new Dashfy server instance
 const dashfy = new Dashfy()
+
+// Load dashboard configuration
+await dashfy.configureFromFile('./dashfy.config.yml')
 
 // Register System API with push mode for real-time updates
 dashfy.registerApi(
@@ -59,53 +77,57 @@ dashfy.registerApi(
   'push',
 )
 
+// Start server
 await dashfy.start()
 ```
 
-> **Important:**
->
-> - Import the client from `@dashfy/ext-system/client` (not the main export). This ensures the Node.js-only `systeminformation` package is not bundled into your browser code.
-> - Use `'push'` mode (third parameter) for real-time system monitoring with custom update intervals.
+> **Important:** the third argument must be `'push'`. The client throws if it is registered in poll mode.
 
-### 2. Client Setup
+### 2. Client setup
 
-Register System widgets in your React application:
+Register System widgets in your React application (`App.tsx`):
 
 ```tsx
-import { WidgetRegistry } from '@dashfy/ui'
+import { WidgetRegistry } from '@getdashfy/ui'
 import {
   CpuUsage,
+  CpuUsageGauge,
   CpuUsageLine,
   DiskUsage,
+  DiskUsageGauge,
   MemoryUsage,
+  MemoryUsageGauge,
   MemoryUsageLine,
   NetworkStats,
+  NetworkStatsCompact,
   NetworkStatsLine,
   Processes,
   SystemInfo,
-} from '@dashfy/ext-system'
+} from '@getdashfy/ext-system'
 
-// Register all System widgets
+// Register System extension
 WidgetRegistry.addExtension('system', {
   CpuUsage,
+  CpuUsageGauge,
   CpuUsageLine,
   DiskUsage,
+  DiskUsageGauge,
   MemoryUsage,
+  MemoryUsageGauge,
   MemoryUsageLine,
   NetworkStats,
+  NetworkStatsCompact,
   NetworkStatsLine,
   Processes,
   SystemInfo,
 })
 ```
 
-### 3. Dashboard Configuration
+### 3. Dashboard configuration
 
-Add System widgets to your dashboard configuration:
+Add System widgets to your dashboard configuration (`dashfy.config.yml`):
 
 ```yaml
-# dashfy.config.yml
-port: 5001
 dashboards:
   - title: System Monitor
     columns: 3
@@ -134,13 +156,17 @@ dashboards:
         rows: 1
 ```
 
-## System Client Configuration
+## System client configuration
 
-### Configuration Options
+### Push mode
+
+This extension uses push mode. In poll mode the Bus controls timing for every API at once, while in push mode each endpoint runs its own interval, which suits fast-changing metrics like CPU and memory. Intervals only run while a widget is subscribed.
+
+#### Configuration options
 
 ```ts
 createSystemClient({
-  // Maximum number of processes to return (sorted by CPU usage)
+  // Maximum number of processes to return, sorted by CPU usage
   processLimit: 10, // default
 
   // Push interval in milliseconds (how often to send updates)
@@ -148,56 +174,40 @@ createSystemClient({
 })
 ```
 
-### Push Mode
+## API endpoints
 
-This extension uses **push mode** for real-time system monitoring. Unlike poll mode (where the Bus controls timing), push mode allows each metric to update at its own frequency:
+`createSystemClient` registers the endpoints below. Widgets subscribe to them through the `endpoint` parameter, and you can call any of them from your own custom widgets.
 
-```ts
-// Register with push mode
-dashfy.registerApi(
-  'system',
-  createSystemClient({
-    pushInterval: 2000, // Update every 2 seconds
-  }),
-  'push', // ← Important: specify push mode
-)
-```
+| Endpoint       | Parameters        | Returns                                       |
+| -------------- | ----------------- | --------------------------------------------- |
+| `systemInfo`   | -                 | CPU model, OS, hardware, hostname, and uptime |
+| `cpuUsage`     | -                 | Current load per core and CPU temperature     |
+| `memoryUsage`  | -                 | RAM and swap usage                            |
+| `diskUsage`    | -                 | Filesystem usage per mount point              |
+| `networkStats` | -                 | Network interfaces and traffic counters       |
+| `processes`    | `limit`, `sortBy` | Top processes by CPU or memory                |
+| `battery`      | -                 | Battery level, charging state, and cycles     |
 
-**Benefits:**
+`battery` has no built-in widget yet — it is available for custom widgets.
 
-- Independent update frequency from other APIs
-- More responsive for fast-changing metrics like CPU/memory
-- Efficient: only active subscriptions run intervals
+## Available widgets
 
-### API Endpoints
+### CPU
 
-The system client exposes the following endpoints:
+#### `CpuUsage`
 
-| Endpoint       | Description                        | Data Source           |
-| -------------- | ---------------------------------- | --------------------- |
-| `systemInfo`   | Static system info (OS, CPU, etc.) | `si.cpu`, `si.osInfo` |
-| `cpuUsage`     | Current CPU load and temperature   | `si.currentLoad`      |
-| `memoryUsage`  | RAM and swap usage                 | `si.mem`              |
-| `diskUsage`    | Filesystem usage per mount         | `si.fsSize`           |
-| `networkStats` | Network interfaces and traffic     | `si.networkStats`     |
-| `processes`    | Top processes by CPU/memory        | `si.processes`        |
-| `battery`      | Battery status (laptops)           | `si.battery`          |
-
-## Available Widgets
-
-### `CpuUsage`
-
-Displays current CPU usage with an overall load bar and optional per-core breakdown.
+Display current CPU usage with an overall load bar and optional per-core breakdown.
 
 **Parameters:**
 
-| Parameter         | Type    | Required | Default    | Description              |
-| ----------------- | ------- | -------- | ---------- | ------------------------ |
-| `title`           | string  | no       | "System"   | Custom widget title      |
-| `showCores`       | boolean | no       | false      | Show per-core usage bars |
-| `showTemperature` | boolean | no       | true       | Show CPU temperature     |
-| `api`             | string  | no       | "system"   | API subscription ID      |
-| `endpoint`        | string  | no       | "cpuUsage" | API endpoint to call     |
+| Parameter         | Type    | Required | Default     | Description              |
+| ----------------- | ------- | -------- | ----------- | ------------------------ |
+| `showCores`       | boolean | no       | false       | Show per-core usage bars |
+| `showTemperature` | boolean | no       | true        | Show CPU temperature     |
+| `title`           | string  | no       | "System"    | Custom widget title      |
+| `subject`         | string  | no       | "CPU Usage" | Custom widget subject    |
+| `api`             | string  | no       | "system"    | API subscription ID      |
+| `endpoint`        | string  | no       | "cpuUsage"  | API endpoint to call     |
 
 **Example:**
 
@@ -210,46 +220,19 @@ Displays current CPU usage with an overall load bar and optional per-core breakd
   rows: 1
 ```
 
----
+#### `CpuUsageGauge`
 
-### `CpuUsageLine`
-
-Displays CPU usage as a real-time animated line chart with smooth interpolation using [Liveline](https://github.com/benjitaylor/liveline).
+Display CPU usage as a radial gauge chart with color-coded status.
 
 **Parameters:**
 
-| Parameter     | Type    | Required | Default    | Description                        |
-| ------------- | ------- | -------- | ---------- | ---------------------------------- |
-| `title`       | string  | no       | "System"   | Custom widget title                |
-| `window`      | number  | no       | 60         | Time window in seconds             |
-| `showWindows` | boolean | no       | true       | Show time window buttons (30s-15m) |
-| `api`         | string  | no       | "system"   | API subscription ID                |
-| `endpoint`    | string  | no       | "cpuUsage" | API endpoint to call               |
-
-**Example:**
-
-```yaml
-- extension: system
-  widget: CpuUsageLine
-  window: 120
-  showWindows: true
-  columns: 2
-  rows: 1
-```
-
----
-
-### `CpuUsageGauge`
-
-Displays CPU usage as a radial gauge chart with color-coded status (green/yellow/red).
-
-**Parameters:**
-
-| Parameter  | Type   | Required | Default    | Description          |
-| ---------- | ------ | -------- | ---------- | -------------------- |
-| `title`    | string | no       | "System"   | Custom widget title  |
-| `api`      | string | no       | "system"   | API subscription ID  |
-| `endpoint` | string | no       | "cpuUsage" | API endpoint to call |
+| Parameter    | Type    | Required | Default     | Description            |
+| ------------ | ------- | -------- | ----------- | ---------------------- |
+| `tickLabels` | boolean | no       | false       | Show gauge tick labels |
+| `title`      | string  | no       | "System"    | Custom widget title    |
+| `subject`    | string  | no       | "CPU Usage" | Custom widget subject  |
+| `api`        | string  | no       | "system"    | API subscription ID    |
+| `endpoint`   | string  | no       | "cpuUsage"  | API endpoint to call   |
 
 **Example:**
 
@@ -260,20 +243,45 @@ Displays CPU usage as a radial gauge chart with color-coded status (green/yellow
   rows: 1
 ```
 
----
+#### `CpuUsageLine`
 
-### `MemoryUsage`
-
-Displays current memory (RAM) usage with a progress bar and detailed breakdown.
+Display CPU usage as a real-time animated line chart.
 
 **Parameters:**
 
-| Parameter  | Type    | Required | Default       | Description           |
-| ---------- | ------- | -------- | ------------- | --------------------- |
-| `title`    | string  | no       | "System"      | Custom widget title   |
-| `showSwap` | boolean | no       | true          | Show swap memory info |
-| `api`      | string  | no       | "system"      | API subscription ID   |
-| `endpoint` | string  | no       | "memoryUsage" | API endpoint to call  |
+| Parameter     | Type    | Required | Default     | Description                        |
+| ------------- | ------- | -------- | ----------- | ---------------------------------- |
+| `showWindows` | boolean | no       | true        | Show time window buttons (30s-15m) |
+| `title`       | string  | no       | "System"    | Custom widget title                |
+| `subject`     | string  | no       | "CPU Usage" | Custom widget subject              |
+| `api`         | string  | no       | "system"    | API subscription ID                |
+| `endpoint`    | string  | no       | "cpuUsage"  | API endpoint to call               |
+
+**Example:**
+
+```yaml
+- extension: system
+  widget: CpuUsageLine
+  showWindows: true
+  columns: 2
+  rows: 1
+```
+
+### Memory
+
+#### `MemoryUsage`
+
+Display current memory (RAM) usage with a progress bar and detailed breakdown.
+
+**Parameters:**
+
+| Parameter  | Type    | Required | Default        | Description           |
+| ---------- | ------- | -------- | -------------- | --------------------- |
+| `showSwap` | boolean | no       | true           | Show swap memory info |
+| `title`    | string  | no       | "System"       | Custom widget title   |
+| `subject`  | string  | no       | "Memory Usage" | Custom widget subject |
+| `api`      | string  | no       | "system"       | API subscription ID   |
+| `endpoint` | string  | no       | "memoryUsage"  | API endpoint to call  |
 
 **Example:**
 
@@ -285,46 +293,19 @@ Displays current memory (RAM) usage with a progress bar and detailed breakdown.
   rows: 1
 ```
 
----
+#### `MemoryUsageGauge`
 
-### `MemoryUsageLine`
-
-Displays memory usage as a real-time animated line chart with smooth interpolation using [Liveline](https://github.com/benjitaylor/liveline).
+Display memory usage as a radial gauge chart with color-coded status.
 
 **Parameters:**
 
-| Parameter     | Type    | Required | Default       | Description                        |
-| ------------- | ------- | -------- | ------------- | ---------------------------------- |
-| `title`       | string  | no       | "System"      | Custom widget title                |
-| `window`      | number  | no       | 60            | Time window in seconds             |
-| `showWindows` | boolean | no       | true          | Show time window buttons (30s-15m) |
-| `api`         | string  | no       | "system"      | API subscription ID                |
-| `endpoint`    | string  | no       | "memoryUsage" | API endpoint to call               |
-
-**Example:**
-
-```yaml
-- extension: system
-  widget: MemoryUsageLine
-  window: 300
-  showWindows: true
-  columns: 2
-  rows: 1
-```
-
----
-
-### `MemoryUsageGauge`
-
-Displays memory usage as a radial gauge chart with color-coded status (green/yellow/red).
-
-**Parameters:**
-
-| Parameter  | Type   | Required | Default       | Description          |
-| ---------- | ------ | -------- | ------------- | -------------------- |
-| `title`    | string | no       | "System"      | Custom widget title  |
-| `api`      | string | no       | "system"      | API subscription ID  |
-| `endpoint` | string | no       | "memoryUsage" | API endpoint to call |
+| Parameter    | Type    | Required | Default        | Description            |
+| ------------ | ------- | -------- | -------------- | ---------------------- |
+| `tickLabels` | boolean | no       | false          | Show gauge tick labels |
+| `title`      | string  | no       | "System"       | Custom widget title    |
+| `subject`    | string  | no       | "Memory Usage" | Custom widget subject  |
+| `api`        | string  | no       | "system"       | API subscription ID    |
+| `endpoint`   | string  | no       | "memoryUsage"  | API endpoint to call   |
 
 **Example:**
 
@@ -335,19 +316,44 @@ Displays memory usage as a radial gauge chart with color-coded status (green/yel
   rows: 1
 ```
 
----
+#### `MemoryUsageLine`
 
-### `DiskUsage`
-
-Displays filesystem/disk usage with progress bars per mount point.
+Display memory usage as a real-time animated line chart.
 
 **Parameters:**
 
-| Parameter  | Type   | Required | Default     | Description          |
-| ---------- | ------ | -------- | ----------- | -------------------- |
-| `title`    | string | no       | "System"    | Custom widget title  |
-| `api`      | string | no       | "system"    | API subscription ID  |
-| `endpoint` | string | no       | "diskUsage" | API endpoint to call |
+| Parameter     | Type    | Required | Default        | Description                        |
+| ------------- | ------- | -------- | -------------- | ---------------------------------- |
+| `showWindows` | boolean | no       | true           | Show time window buttons (30s-15m) |
+| `title`       | string  | no       | "System"       | Custom widget title                |
+| `subject`     | string  | no       | "Memory Usage" | Custom widget subject              |
+| `api`         | string  | no       | "system"       | API subscription ID                |
+| `endpoint`    | string  | no       | "memoryUsage"  | API endpoint to call               |
+
+**Example:**
+
+```yaml
+- extension: system
+  widget: MemoryUsageLine
+  showWindows: true
+  columns: 2
+  rows: 1
+```
+
+### Disk
+
+#### `DiskUsage`
+
+Display filesystem usage with progress bars per mount point.
+
+**Parameters:**
+
+| Parameter  | Type   | Required | Default      | Description           |
+| ---------- | ------ | -------- | ------------ | --------------------- |
+| `title`    | string | no       | "System"     | Custom widget title   |
+| `subject`  | string | no       | "Disk Usage" | Custom widget subject |
+| `api`      | string | no       | "system"     | API subscription ID   |
+| `endpoint` | string | no       | "diskUsage"  | API endpoint to call  |
 
 **Example:**
 
@@ -358,20 +364,20 @@ Displays filesystem/disk usage with progress bars per mount point.
   rows: 1
 ```
 
----
+#### `DiskUsageGauge`
 
-### `DiskUsageGauge`
-
-Displays disk usage as a radial gauge chart with color-coded status (green/yellow/red).
+Display disk usage as a radial gauge chart with color-coded status.
 
 **Parameters:**
 
-| Parameter  | Type   | Required | Default     | Description                      |
-| ---------- | ------ | -------- | ----------- | -------------------------------- |
-| `title`    | string | no       | "System"    | Custom widget title              |
-| `mount`    | string | no       | (first)     | Mount point to display (e.g., /) |
-| `api`      | string | no       | "system"    | API subscription ID              |
-| `endpoint` | string | no       | "diskUsage" | API endpoint to call             |
+| Parameter    | Type    | Required | Default      | Description                     |
+| ------------ | ------- | -------- | ------------ | ------------------------------- |
+| `mount`      | string  | no       | first mount  | Mount point to display (e.g. /) |
+| `tickLabels` | boolean | no       | false        | Show gauge tick labels          |
+| `title`      | string  | no       | "System"     | Custom widget title             |
+| `subject`    | string  | no       | "Disk Usage" | Custom widget subject           |
+| `api`        | string  | no       | "system"     | API subscription ID             |
+| `endpoint`   | string  | no       | "diskUsage"  | API endpoint to call            |
 
 **Example:**
 
@@ -383,19 +389,20 @@ Displays disk usage as a radial gauge chart with color-coded status (green/yello
   rows: 1
 ```
 
----
+### Network
 
-### `NetworkStats`
+#### `NetworkStats`
 
-Displays network interface stats including bytes transferred and current speed.
+Display network interface stats including bytes transferred and current speed.
 
 **Parameters:**
 
-| Parameter  | Type   | Required | Default        | Description          |
-| ---------- | ------ | -------- | -------------- | -------------------- |
-| `title`    | string | no       | "System"       | Custom widget title  |
-| `api`      | string | no       | "system"       | API subscription ID  |
-| `endpoint` | string | no       | "networkStats" | API endpoint to call |
+| Parameter  | Type   | Required | Default        | Description           |
+| ---------- | ------ | -------- | -------------- | --------------------- |
+| `title`    | string | no       | "System"       | Custom widget title   |
+| `subject`  | string | no       | "Network"      | Custom widget subject |
+| `api`      | string | no       | "system"       | API subscription ID   |
+| `endpoint` | string | no       | "networkStats" | API endpoint to call  |
 
 **Example:**
 
@@ -406,49 +413,19 @@ Displays network interface stats including bytes transferred and current speed.
   rows: 1
 ```
 
----
+#### `NetworkStatsCompact`
 
-### `NetworkStatsLine`
-
-Displays network traffic (RX/TX) as a real-time multi-series animated line chart using [Liveline](https://github.com/benjitaylor/liveline).
+Display combined network traffic (RX + TX) in a compact view.
 
 **Parameters:**
 
-| Parameter     | Type    | Required | Default        | Description                        |
-| ------------- | ------- | -------- | -------------- | ---------------------------------- |
-| `title`       | string  | no       | "System"       | Custom widget title                |
-| `interface`   | string  | no       | (auto)         | Network interface (e.g., 'en0')    |
-| `window`      | number  | no       | 60             | Time window in seconds             |
-| `showWindows` | boolean | no       | true           | Show time window buttons (30s-15m) |
-| `api`         | string  | no       | "system"       | API subscription ID                |
-| `endpoint`    | string  | no       | "networkStats" | API endpoint to call               |
-
-**Example:**
-
-```yaml
-- extension: system
-  widget: NetworkStatsLine
-  interface: en0
-  window: 120
-  showWindows: true
-  columns: 2
-  rows: 1
-```
-
----
-
-### `NetworkStatsCompact`
-
-Displays combined network traffic (RX + TX) in a compact text view.
-
-**Parameters:**
-
-| Parameter   | Type   | Required | Default        | Description                     |
-| ----------- | ------ | -------- | -------------- | ------------------------------- |
-| `title`     | string | no       | "System"       | Custom widget title             |
-| `interface` | string | no       | (auto)         | Network interface (e.g., 'en0') |
-| `api`       | string | no       | "system"       | API subscription ID             |
-| `endpoint`  | string | no       | "networkStats" | API endpoint to call            |
+| Parameter   | Type   | Required | Default           | Description                        |
+| ----------- | ------ | -------- | ----------------- | ---------------------------------- |
+| `interface` | string | no       | first active      | Network interface (e.g. en0, eth0) |
+| `title`     | string | no       | "System"          | Custom widget title                |
+| `subject`   | string | no       | "Network Traffic" | Custom widget subject              |
+| `api`       | string | no       | "system"          | API subscription ID                |
+| `endpoint`  | string | no       | "networkStats"    | API endpoint to call               |
 
 **Example:**
 
@@ -460,19 +437,46 @@ Displays combined network traffic (RX + TX) in a compact text view.
   rows: 1
 ```
 
----
+#### `NetworkStatsLine`
 
-### `Processes`
+Display network traffic (RX/TX) as a real-time multi-series animated line chart.
 
-Displays top processes sorted by CPU or memory usage.
+**Parameters:**
+
+| Parameter     | Type    | Required | Default           | Description                        |
+| ------------- | ------- | -------- | ----------------- | ---------------------------------- |
+| `interface`   | string  | no       | first active      | Network interface (e.g. en0, eth0) |
+| `showWindows` | boolean | no       | true              | Show time window buttons (30s-15m) |
+| `title`       | string  | no       | "System"          | Custom widget title                |
+| `subject`     | string  | no       | "Network Traffic" | Custom widget subject              |
+| `api`         | string  | no       | "system"          | API subscription ID                |
+| `endpoint`    | string  | no       | "networkStats"    | API endpoint to call               |
+
+**Example:**
+
+```yaml
+- extension: system
+  widget: NetworkStatsLine
+  interface: en0
+  showWindows: true
+  columns: 2
+  rows: 1
+```
+
+### Processes & info
+
+#### `Processes`
+
+Display top processes sorted by CPU or memory usage.
 
 **Parameters:**
 
 | Parameter  | Type           | Required | Default     | Description                 |
 | ---------- | -------------- | -------- | ----------- | --------------------------- |
-| `title`    | string         | no       | "System"    | Custom widget title         |
 | `limit`    | number         | no       | 10          | Max processes to display    |
 | `sortBy`   | "cpu" \| "mem" | no       | "cpu"       | Sort by CPU or memory usage |
+| `title`    | string         | no       | "System"    | Custom widget title         |
+| `subject`  | string         | no       | "Processes" | Custom widget subject       |
 | `api`      | string         | no       | "system"    | API subscription ID         |
 | `endpoint` | string         | no       | "processes" | API endpoint to call        |
 
@@ -487,19 +491,18 @@ Displays top processes sorted by CPU or memory usage.
   rows: 1
 ```
 
----
+#### `SystemInfo`
 
-### `SystemInfo`
-
-Displays static system information: hostname, OS, CPU model, uptime, etc.
+Display static system information: hostname, OS, CPU model, uptime, and hardware details.
 
 **Parameters:**
 
-| Parameter  | Type   | Required | Default      | Description          |
-| ---------- | ------ | -------- | ------------ | -------------------- |
-| `title`    | string | no       | "System"     | Custom widget title  |
-| `api`      | string | no       | "system"     | API subscription ID  |
-| `endpoint` | string | no       | "systemInfo" | API endpoint to call |
+| Parameter  | Type   | Required | Default      | Description           |
+| ---------- | ------ | -------- | ------------ | --------------------- |
+| `title`    | string | no       | "System"     | Custom widget title   |
+| `subject`  | string | no       | "Info"       | Custom widget subject |
+| `api`      | string | no       | "system"     | API subscription ID   |
+| `endpoint` | string | no       | "systemInfo" | API endpoint to call  |
 
 **Example:**
 
@@ -510,14 +513,11 @@ Displays static system information: hostname, OS, CPU model, uptime, etc.
   rows: 1
 ```
 
----
+## Complete example
 
-## Complete Examples
-
-### Example 1: Full System Monitor
+A full system monitor dashboard:
 
 ```yaml
-# dashfy.config.yml
 dashboards:
   - title: System Monitor
     columns: 3
@@ -577,137 +577,49 @@ dashboards:
         rows: 1
 ```
 
-### Example 2: Compact Overview
+## Cross-platform support
 
-```yaml
-dashboards:
-  - title: Server Health
-    columns: 2
-    rows: 2
-    widgets:
-      - extension: system
-        widget: CpuUsage
-        x: 0
-        y: 0
-        columns: 1
-        rows: 1
-
-      - extension: system
-        widget: MemoryUsage
-        x: 1
-        y: 0
-        columns: 1
-        rows: 1
-
-      - extension: system
-        widget: DiskUsage
-        x: 0
-        y: 1
-        columns: 1
-        rows: 1
-
-      - extension: system
-        widget: Processes
-        limit: 5
-        x: 1
-        y: 1
-        columns: 1
-        rows: 1
-```
-
-### Example 3: TypeScript Configuration
-
-```ts
-import type { DashfyConfig } from '@dashfy/types'
-
-const config: DashfyConfig = {
-  dashboards: [
-    {
-      title: 'System Monitor',
-      columns: 3,
-      rows: 2,
-      widgets: [
-        {
-          extension: 'system',
-          widget: 'CpuUsage',
-          showCores: true,
-          x: 0,
-          y: 0,
-          columns: 1,
-          rows: 1,
-        },
-        {
-          extension: 'system',
-          widget: 'MemoryUsage',
-          x: 1,
-          y: 0,
-          columns: 1,
-          rows: 1,
-        },
-        {
-          extension: 'system',
-          widget: 'Processes',
-          limit: 15,
-          sortBy: 'cpu',
-          x: 2,
-          y: 0,
-          columns: 1,
-          rows: 2,
-        },
-      ],
-    },
-  ],
-}
-
-export default config
-```
-
-## Cross-Platform Support
-
-This extension uses [systeminformation](https://github.com/sebhildebrandt/systeminformation) which supports:
+[systeminformation](https://github.com/sebhildebrandt/systeminformation) backs every endpoint, so platform coverage follows its own:
 
 - **macOS**: Full support including CPU temperature (via powermetrics)
 - **Linux**: Full support including CPU temperature
 - **Windows**: Full support (some features may require admin privileges)
 - **FreeBSD/OpenBSD**: Partial support
 
-> **Note:** CPU temperature may not be available on all systems. When unavailable, the widget gracefully displays "N/A".
+> **Note:** CPU temperature is not available on all systems. When unavailable, the widget displays "N/A".
 
 ## Troubleshooting
 
 ### CPU temperature shows N/A
 
-**Solution:** CPU temperature is not available on all hardware. On macOS, it may require running the server with elevated privileges. On Linux, ensure `lm-sensors` is installed.
+**Solution:** CPU temperature is not available on all hardware. On macOS it may require running the server with elevated privileges. On Linux, ensure `lm-sensors` is installed.
 
 ### High CPU usage from the extension itself
 
-**Solution:** Increase the `pushInterval` (e.g., 3000ms or 5000ms) or limit the number of system widgets.
+**Solution:** Increase `pushInterval` (for example 3000ms or 5000ms) or reduce the number of system widgets on the dashboard.
 
 ### No network interfaces shown
 
-**Solution:** The widget only displays active ("up") interfaces. Ensure your network interfaces are connected and active.
+**Solution:** Only active ("up") interfaces are displayed. Ensure your interfaces are connected.
 
 ### Processes list is empty
 
-**Solution:** Some environments may restrict process listing. Ensure the Dashfy server has appropriate permissions to read process information.
+**Solution:** Some environments restrict process listing. Ensure the Dashfy server has permission to read process information.
+
+### "requires push mode" error on startup
+
+**Solution:** Pass `'push'` as the third argument to `registerApi`. This client has no poll-mode fallback.
 
 ## Contributing
 
-Contributions are welcome! Please refer to the main [Dashfy contributing guide](https://github.com/dashfy/dashfy/blob/main/CONTRIBUTING.md).
+Contributions are welcome. For issues and pull requests related to the extension, use the [dashfy/dashfy-ext-system](https://github.com/dashfy/dashfy-ext-system) repository. Framework contributions belong in [dashfy/dashfy](https://github.com/dashfy/dashfy).
 
-## Related Packages
+## Community
 
-- [`@dashfy/server`](https://www.npmjs.com/package/@dashfy/server) - Dashfy server
-- [`@dashfy/ui`](https://www.npmjs.com/package/@dashfy/ui) - Dashfy UI components
-- [`@dashfy/types`](https://www.npmjs.com/package/@dashfy/types) - Dashfy TypeScript types
-- [`@dashfy/ext-github`](https://www.npmjs.com/package/@dashfy/ext-github) - GitHub extension
-- [`@dashfy/ext-json`](https://www.npmjs.com/package/@dashfy/ext-json) - JSON/REST API extension
-- [`@dashfy/ext-nba`](https://www.npmjs.com/package/@dashfy/ext-nba) - NBA extension
+Join the community on [Dashfy's Discord server](https://dashfy.dev/discord) to discuss the project, ask questions, or get help.
+
+Join the conversation on X (Twitter) and follow [@dashfydev](https://x.com/dashfydev) for updates and announcements.
 
 ## License
 
-MIT © [Breno Polanski](https://github.com/brenopolanski)
-
----
-
-Part of the [Dashfy](https://github.com/dashfy/dashfy) project.
+This project is licensed under the AGPL-3.0 License - see the [LICENSE](./LICENSE) file for details.

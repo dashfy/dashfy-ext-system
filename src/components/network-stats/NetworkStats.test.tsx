@@ -3,15 +3,15 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { NetworkStats } from './NetworkStats'
 
-vi.mock('@dashfy/ui', async () => {
-  const actual = await vi.importActual('@dashfy/ui')
+vi.mock('@getdashfy/ui', async () => {
+  const actual = await vi.importActual('@getdashfy/ui')
   return {
     ...actual,
     useApiSubscription: vi.fn(),
   }
 })
 
-const { useApiSubscription } = await import('@dashfy/ui')
+const { useApiSubscription } = await import('@getdashfy/ui')
 import { networkStatsNoActive, networkStatsResponse } from '@/test-fixtures'
 
 describe('NetworkStats', () => {

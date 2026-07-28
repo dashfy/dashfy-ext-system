@@ -9,8 +9,8 @@ import {
   WidgetHeader,
   WidgetLoader,
   WidgetStatusChip,
-} from '@dashfy/ui'
-import { formatBytes, formatBytesPerSecond } from '@dashfy/utils'
+} from '@getdashfy/ui'
+import { formatBytes, formatBytesPerSecond } from '@getdashfy/utils'
 import { NetworkIcon } from 'lucide-react'
 
 import type { NetworkStatsResponse } from '@/types'
@@ -43,22 +43,9 @@ export interface NetworkStatsProps {
  * Displays network interface stats including bytes transferred and current speed.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "NetworkStats"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: NetworkStats
- * ```
- *
- * @example
- * ```tsx
- * <NetworkStats />
+ * - extension: system
+ *   widget: NetworkStats
  * ```
  */
 export const NetworkStats = ({

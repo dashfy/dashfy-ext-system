@@ -1,4 +1,4 @@
-import type { ChartConfig } from '@dashfy/ui'
+import type { ChartConfig } from '@getdashfy/ui'
 import {
   ChartContainer,
   useApiSubscription,
@@ -9,8 +9,8 @@ import {
   WidgetErrorBoundary,
   WidgetHeader,
   WidgetLoader,
-} from '@dashfy/ui'
-import { formatBytes, formatPercent } from '@dashfy/utils'
+} from '@getdashfy/ui'
+import { formatBytes, formatPercent } from '@getdashfy/utils'
 import type { LivelinePoint } from 'liveline'
 import { Liveline } from 'liveline'
 import { MemoryStickIcon } from 'lucide-react'
@@ -51,22 +51,9 @@ export interface MemoryUsageLineProps {
  * Displays memory usage as a real-time animated line chart.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "MemoryUsageLine"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: MemoryUsageLine
- * ```
- *
- * @example
- * ```tsx
- * <MemoryUsageLine />
+ * - extension: system
+ *   widget: MemoryUsageLine
  * ```
  */
 export const MemoryUsageLine = ({

@@ -6,8 +6,8 @@ import {
   WidgetError,
   WidgetHeader,
   WidgetLoader,
-} from '@dashfy/ui'
-import { formatBytesPerSecond } from '@dashfy/utils'
+} from '@getdashfy/ui'
+import { formatBytesPerSecond } from '@getdashfy/utils'
 import { NetworkIcon } from 'lucide-react'
 
 import type { NetworkStatsResponse } from '@/types'
@@ -48,22 +48,9 @@ export interface NetworkStatsCompactProps {
  * Displays combined network traffic (RX + TX) in a compact view.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "NetworkStatsCompact"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: NetworkStatsCompact
- * ```
- *
- * @example
- * ```tsx
- * <NetworkStatsCompact />
+ * - extension: system
+ *   widget: NetworkStatsCompact
  * ```
  */
 export const NetworkStatsCompact = ({

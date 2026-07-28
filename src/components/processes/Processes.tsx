@@ -11,8 +11,8 @@ import {
   WidgetTable,
   WidgetTableCell,
   WidgetTableHeadCell,
-} from '@dashfy/ui'
-import { formatPercent } from '@dashfy/utils'
+} from '@getdashfy/ui'
+import { formatPercent } from '@getdashfy/utils'
 import { ListIcon } from 'lucide-react'
 
 import type { ProcessesResponse } from '@/types'
@@ -55,22 +55,9 @@ export interface ProcessesProps {
  * Displays top processes sorted by CPU or memory usage.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "Processes"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: Processes
- * ```
- *
- * @example
- * ```tsx
- * <Processes />
+ * - extension: system
+ *   widget: Processes
  * ```
  */
 export const Processes = ({

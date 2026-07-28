@@ -1,4 +1,4 @@
-import type { ChartConfig } from '@dashfy/ui'
+import type { ChartConfig } from '@getdashfy/ui'
 import {
   ChartContainer,
   useApiSubscription,
@@ -9,8 +9,8 @@ import {
   WidgetErrorBoundary,
   WidgetHeader,
   WidgetLoader,
-} from '@dashfy/ui'
-import { formatPercent } from '@dashfy/utils'
+} from '@getdashfy/ui'
+import { formatPercent } from '@getdashfy/utils'
 import type { LivelinePoint } from 'liveline'
 import { Liveline } from 'liveline'
 import { CpuIcon } from 'lucide-react'
@@ -51,22 +51,9 @@ export interface CpuUsageLineProps {
  * Displays CPU usage as a real-time animated line chart.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "CpuUsageLine"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: CpuUsageLine
- * ```
- *
- * @example
- * ```tsx
- * <CpuUsageLine />
+ * - extension: system
+ *   widget: CpuUsageLine
  * ```
  */
 export const CpuUsageLine = ({

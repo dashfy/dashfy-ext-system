@@ -7,8 +7,8 @@ import {
   WidgetErrorBoundary,
   WidgetHeader,
   WidgetLoader,
-} from '@dashfy/ui'
-import { formatBytes, formatPercent } from '@dashfy/utils'
+} from '@getdashfy/ui'
+import { formatBytes, formatPercent } from '@getdashfy/utils'
 import { MemoryStickIcon } from 'lucide-react'
 
 import type { MemoryUsageResponse } from '@/types'
@@ -46,22 +46,9 @@ export interface MemoryUsageProps {
  * Displays current memory (RAM) usage with a progress bar and detailed breakdown.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "MemoryUsage"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: MemoryUsage
- * ```
- *
- * @example
- * ```tsx
- * <MemoryUsage />
+ * - extension: system
+ *   widget: MemoryUsage
  * ```
  */
 export const MemoryUsage = ({

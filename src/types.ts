@@ -1,3 +1,10 @@
+/**
+ * Shapes of the payloads returned by the system client endpoints.
+ *
+ * These mirror the `systeminformation` results the client pushes to widgets,
+ * narrowed to the fields the widgets actually render.
+ */
+
 export interface CpuData {
   manufacturer: string
   brand: string

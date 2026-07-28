@@ -7,7 +7,7 @@ import {
   WidgetErrorBoundary,
   WidgetHeader,
   WidgetLoader,
-} from '@dashfy/ui'
+} from '@getdashfy/ui'
 import { Gauge } from 'livegauge'
 import { CpuIcon } from 'lucide-react'
 
@@ -46,22 +46,9 @@ export interface CpuUsageGaugeProps {
  * Displays CPU usage as a radial gauge chart.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "CpuUsageGauge"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: CpuUsageGauge
- * ```
- *
- * @example
- * ```tsx
- * <CpuUsageGauge />
+ * - extension: system
+ *   widget: CpuUsageGauge
  * ```
  */
 export const CpuUsageGauge = ({

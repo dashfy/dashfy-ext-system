@@ -7,8 +7,8 @@ import {
   WidgetHeader,
   WidgetListItem,
   WidgetLoader,
-} from '@dashfy/ui'
-import { format } from '@dashfy/utils'
+} from '@getdashfy/ui'
+import { format } from '@getdashfy/utils'
 import { ServerIcon } from 'lucide-react'
 
 import type { SystemInfoResponse } from '@/types'
@@ -41,22 +41,9 @@ export interface SystemInfoProps {
  * Displays static system information: hostname, OS, CPU model, uptime, etc.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "SystemInfo"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: SystemInfo
- * ```
- *
- * @example
- * ```tsx
- * <SystemInfo />
+ * - extension: system
+ *   widget: SystemInfo
  * ```
  */
 export const SystemInfo = ({

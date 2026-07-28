@@ -1,4 +1,4 @@
-import type { APIRegistration } from '@dashfy/types'
+import type { APIRegistration } from '@getdashfy/types'
 import si from 'systeminformation'
 
 const DEFAULT_PROCESS_LIMIT = 10
@@ -32,8 +32,8 @@ export interface SystemClientConfig {
  *
  * @example
  * ```ts
- * import { Dashfy } from '@dashfy/server'
- * import { createSystemClient } from '@dashfy/ext-system/client'
+ * import { Dashfy } from '@getdashfy/server'
+ * import { createSystemClient } from '@getdashfy/ext-system/client'
  *
  * const dashfy = new Dashfy()
  * dashfy.registerApi('system', createSystemClient(), 'push')
@@ -45,7 +45,7 @@ export function createSystemClient(config: SystemClientConfig = {}): APIRegistra
   return ({ logger, createPushInterval }) => {
     if (!createPushInterval) {
       throw new Error(
-        "@dashfy/ext-system requires push mode. Register with: dashfy.registerApi('system', createSystemClient(), 'push')",
+        "@getdashfy/ext-system requires push mode. Register with: dashfy.registerApi('system', createSystemClient(), 'push')",
       )
     }
 

@@ -7,7 +7,7 @@ import {
   WidgetErrorBoundary,
   WidgetHeader,
   WidgetLoader,
-} from '@dashfy/ui'
+} from '@getdashfy/ui'
 import { Gauge } from 'livegauge'
 import { MemoryStickIcon } from 'lucide-react'
 
@@ -46,22 +46,9 @@ export interface MemoryUsageGaugeProps {
  * Displays memory usage as a radial gauge chart.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "MemoryUsageGauge"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: MemoryUsageGauge
- * ```
- *
- * @example
- * ```tsx
- * <MemoryUsageGauge />
+ * - extension: system
+ *   widget: MemoryUsageGauge
  * ```
  */
 export const MemoryUsageGauge = ({

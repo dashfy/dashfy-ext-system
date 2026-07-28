@@ -8,8 +8,8 @@ import {
   WidgetErrorBoundary,
   WidgetHeader,
   WidgetLoader,
-} from '@dashfy/ui'
-import { formatBytes, formatPercent } from '@dashfy/utils'
+} from '@getdashfy/ui'
+import { formatBytes, formatPercent } from '@getdashfy/utils'
 import { HardDriveIcon } from 'lucide-react'
 
 import type { DiskUsageResponse } from '@/types'
@@ -42,22 +42,9 @@ export interface DiskUsageProps {
  * Displays filesystem/disk usage with progress bars per mount point.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "DiskUsage"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: DiskUsage
- * ```
- *
- * @example
- * ```tsx
- * <DiskUsage />
+ * - extension: system
+ *   widget: DiskUsage
  * ```
  */
 export const DiskUsage = ({

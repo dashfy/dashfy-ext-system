@@ -1,38 +1,7 @@
 import '@testing-library/jest-dom/vitest'
 
 import * as React from 'react'
-import { afterEach, beforeEach, vi } from 'vitest'
-
-/** Recharts logs this when ResponsiveContainer measures 0×0 in jsdom (line chart tests). */
-const RECHARTS_ZERO_SIZE_WARNING = /width\(0\) and height\(0\) of chart/i
-
-function shouldSilenceChartSizeMessage(firstArg: unknown): boolean {
-  return typeof firstArg === 'string' && RECHARTS_ZERO_SIZE_WARNING.test(firstArg)
-}
-
-const consoleWarn = console.warn.bind(console)
-const consoleError = console.error.bind(console)
-
-beforeEach(() => {
-  vi.spyOn(console, 'warn').mockImplementation((first, ...rest) => {
-    if (shouldSilenceChartSizeMessage(first)) {
-      return
-    }
-    consoleWarn(first as never, ...(rest as never[]))
-  })
-
-  vi.spyOn(console, 'error').mockImplementation((first, ...rest) => {
-    if (shouldSilenceChartSizeMessage(first)) {
-      return
-    }
-    consoleError(first as never, ...(rest as never[]))
-  })
-})
-
-afterEach(() => {
-  vi.mocked(console.warn).mockRestore()
-  vi.mocked(console.error).mockRestore()
-})
+import { vi } from 'vitest'
 
 vi.mock('livegauge', () => ({
   Gauge: (props: { label?: string }) =>
@@ -88,11 +57,39 @@ Object.defineProperty(window, 'matchMedia', {
   })),
 })
 
-// Mock ResizeObserver
-class ResizeObserverMock {
-  observe = vi.fn()
+// Mock ResizeObserver for chart containers. They size themselves from the observed
+// entry, and jsdom has no layout engine, so an observer that never reports a size
+// leaves charts at 0x0 and the chart library warns about it. Report a fixed size so
+// charts render as in a browser.
+const OBSERVED_WIDTH = 800
+const OBSERVED_HEIGHT = 400
+
+const observedRect: DOMRectReadOnly = {
+  x: 0,
+  y: 0,
+  top: 0,
+  left: 0,
+  right: OBSERVED_WIDTH,
+  bottom: OBSERVED_HEIGHT,
+  width: OBSERVED_WIDTH,
+  height: OBSERVED_HEIGHT,
+  toJSON: () => ({}),
+}
+
+class ResizeObserverMock implements ResizeObserver {
   unobserve = vi.fn()
+
   disconnect = vi.fn()
+
+  private readonly callback: ResizeObserverCallback
+
+  constructor(callback: ResizeObserverCallback) {
+    this.callback = callback
+  }
+
+  observe(target: Element) {
+    this.callback([{ target, contentRect: observedRect } as ResizeObserverEntry], this)
+  }
 }
 
 Object.defineProperty(window, 'ResizeObserver', {

@@ -8,7 +8,7 @@ import {
   WidgetErrorBoundary,
   WidgetHeader,
   WidgetLoader,
-} from '@dashfy/ui'
+} from '@getdashfy/ui'
 import { Gauge } from 'livegauge'
 import { HardDriveIcon } from 'lucide-react'
 
@@ -52,22 +52,9 @@ export interface DiskUsageGaugeProps {
  * Displays disk usage as a radial gauge chart.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "DiskUsageGauge"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: DiskUsageGauge
- * ```
- *
- * @example
- * ```tsx
- * <DiskUsageGauge />
+ * - extension: system
+ *   widget: DiskUsageGauge
  * ```
  */
 export const DiskUsageGauge = ({

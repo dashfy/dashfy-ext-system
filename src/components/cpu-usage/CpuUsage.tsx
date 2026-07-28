@@ -8,8 +8,8 @@ import {
   WidgetErrorBoundary,
   WidgetHeader,
   WidgetLoader,
-} from '@dashfy/ui'
-import { formatPercent, formatTemperature } from '@dashfy/utils'
+} from '@getdashfy/ui'
+import { formatPercent, formatTemperature } from '@getdashfy/utils'
 import { CpuIcon } from 'lucide-react'
 
 import type { CpuUsageResponse } from '@/types'
@@ -52,21 +52,9 @@ export interface CpuUsageProps {
  * Displays current CPU usage with an overall load bar and optional per-core breakdown.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "CpuUsage"
- * }
- *
- * @example
  * ```yaml
- * extension: system
- * widget: CpuUsage
- * ```
- *
- * @example
- * ```tsx
- * <CpuUsage />
+ * - extension: system
+ *   widget: CpuUsage
  * ```
  */
 export const CpuUsage = ({

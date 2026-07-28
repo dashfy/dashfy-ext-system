@@ -1,4 +1,4 @@
-import type { ChartConfig } from '@dashfy/ui'
+import type { ChartConfig } from '@getdashfy/ui'
 import {
   ChartContainer,
   useApiSubscription,
@@ -10,8 +10,8 @@ import {
   WidgetErrorBoundary,
   WidgetHeader,
   WidgetLoader,
-} from '@dashfy/ui'
-import { formatBytesPerSecond } from '@dashfy/utils'
+} from '@getdashfy/ui'
+import { formatBytesPerSecond } from '@getdashfy/utils'
 import type { LivelineSeries } from 'liveline'
 import { Liveline } from 'liveline'
 import { NetworkIcon } from 'lucide-react'
@@ -57,22 +57,9 @@ export interface NetworkStatsLineProps {
  * Displays network traffic (RX/TX) as a real-time multi-series animated line chart.
  *
  * @example
- * ```json
- * {
- *   "extension": "system",
- *   "widget": "NetworkStatsLine"
- * }
- * ```
- *
- * @example
  * ```yaml
- * extension: system
- * widget: NetworkStatsLine
- * ```
- *
- * @example
- * ```tsx
- * <NetworkStatsLine />
+ * - extension: system
+ *   widget: NetworkStatsLine
  * ```
  */
 export const NetworkStatsLine = ({
