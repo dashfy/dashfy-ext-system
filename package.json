@@ -1,6 +1,6 @@
 {
   "name": "@getdashfy/ext-system",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "System extension for Dashfy - Monitor CPU, memory, disk, network, and processes",
   "keywords": [
     "dashfy",
@@ -112,6 +112,7 @@
     "lint:fix": "eslint . --fix",
     "prepare": "husky",
     "prettier": "prettier \"**/*.{js,mjs,ts,tsx,css,json,md}\"",
+    "sync:dashfy": "node scripts/sync-dashfy-deps.js",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit",
@@ -124,7 +125,7 @@
     "systeminformation": "^5.31.3"
   },
   "peerDependencies": {
-    "@getdashfy/ui": "^0.2.1",
+    "@getdashfy/ui": "^0.3.1",
     "lucide-react": "^0.454.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
@@ -135,8 +136,8 @@
     "@commitlint/cli": "^19.6.1",
     "@commitlint/config-conventional": "^19.6.1",
     "@eslint/js": "^9.17.0",
-    "@getdashfy/types": "^0.1.1",
-    "@getdashfy/ui": "^0.2.1",
+    "@getdashfy/types": "^0.3.0",
+    "@getdashfy/ui": "^0.3.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.0.1",
     "@types/node": "^22.8.6",
